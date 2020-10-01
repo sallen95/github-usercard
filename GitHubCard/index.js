@@ -9,7 +9,6 @@ axios.get('https://api.github.com/users/sallen95')
   .then(res => {
     console.log('here is the response organized by axios', res)
     console.log('response BODY', res.data)
-    debugger
   })
   .catch(drama => {
     console.log(drama)
@@ -28,6 +27,17 @@ axios.get('https://api.github.com/users/sallen95')
   STEP 4: Pass the data received from Github into your function,
     and append the returned markup to the DOM as a child of .cards
 */
+const entry = document.querySelector('.cards')
+
+axios.get('https://api.github.com/users/sallen95')
+  .then(res => {
+    const gitCard = cardMaker(res)
+    entry.append(gitCard)
+  })
+  .catch(drama => {
+    console.log(drama)
+    debugger
+  })
 
 /*
   STEP 5: Now that you have your own card getting added to the DOM, either
@@ -40,7 +50,31 @@ axios.get('https://api.github.com/users/sallen95')
     user, and adding that card to the DOM.
 */
 
-const followersArray = [];
+const followersArray = ['tetondan', 'dustinmyers', 'justsml', 'luishrd', 'bigknell'];
+
+followersArray.forEach(function(item){
+  let dataURL = `https://api.github.com/users/${item}`
+  axios.get(dataURL)
+    .then(res => {
+      const gitCards = cardMaker(res)
+      entry.append(gitCards)
+    })
+    .catch(err => {
+      console.log(err)
+      debugger
+    })
+})
+
+// axios.get(`https://api.github.com/users/${usernames}`)
+//   .then(res => {
+//     const gitCards = cardMaker(res)
+//     entry.append(gitCards)
+//   })
+//   .catch(drama => {
+//     console.log(drama)
+//     debugger
+//   })
+
 
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
@@ -61,7 +95,8 @@ const followersArray = [];
       </div>
     </div>
 */
-function cardMaker(data) {
+
+function cardMaker(res) {
   const card = document.createElement('div')
   const cardImage = document.createElement('img')
   const cardInfo = document.createElement('div')
@@ -85,19 +120,29 @@ function cardMaker(data) {
   cardInfo.appendChild(cardUserName)
   cardInfo.appendChild(cardLocation)
   cardInfo.appendChild(cardProfile)
+  cardProfile.appendChild(cardURL)
   cardInfo.appendChild(cardFollowers)
   cardInfo.appendChild(cardFollowing)
   cardInfo.appendChild(cardBio)
-  cardProfile.appendChild(cardURL)
   
-  cardImage.src = data.avatar_url
-  cardName.textContent = data.name
-  cardUserName.textContent = data.login
-  cardLocation.textContent = data.location
+  
+  cardImage.src = res.data.avatar_url
+  cardURL.href = res.data.html_url
+  cardName.textContent = res.data.name
+  cardUserName.textContent = res.data.login
+  cardLocation.textContent = `Location: ${res.data.location}`
+  cardProfile.textContent = `Profile: ${res.data.html_url}`
+  cardURL.textContent = res.data.html_url
+  cardFollowers.textContent = `Followers: ${res.data.followers}`
+  cardFollowing.textContent = `Following: ${res.data.following}`
+  cardBio.textContent = `Bio: ${res.data.bio}`
 
-
+  return card
 }
 
+
+
+// console.log(cardMaker(sallen95))
 /*
   List of LS Instructors Github username's:
     tetondan
@@ -106,3 +151,4 @@ function cardMaker(data) {
     luishrd
     bigknell
 */
+
